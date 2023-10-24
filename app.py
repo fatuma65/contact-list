@@ -2,7 +2,6 @@ from flask import Flask, jsonify, request
 
 #this is a module that generates unique id numbers
 import uuid
-
 import json
 
 app = Flask(__name__)
@@ -35,6 +34,13 @@ def add_contact():
         return {"error": "phone number is required"}, 400
     if len(phone_number) < 10:
         return {"error": "phone number must be atleast 10 characters"}, 400
+   
+    for index, number in enumerate(db):
+        if number["phone_number"] == phone_number:
+            return {"error": "phone number already exists in list"}
+            
+    # if phone_number in db:
+        # return {"error": "phone number already exists"}
     
     new = {
         "first_name":  first_name,
@@ -85,6 +91,10 @@ def update_contact(contact_id):
     else:
         phone_number = db_contact["phone number"]
 
+    for i, number in enumerate(db):
+        if number["phone_number"] == phone_number:
+            return {"error": "phone number already exists in list"}
+
     new_contact = {
         "first_name": first_name,
         "last_name": last_name,
@@ -98,13 +108,13 @@ def update_contact(contact_id):
     return {"message": "Contact has been updated", "data": new_contact}, 200
 
 # returning an existing single contact using id
-@app.route('/list/<id>', methods=['GET'])
-def single_contact(id):
+@app.route('/contact/<contact_id>', methods=['GET'])
+def single_contact(contact_id):
 
     if db is None:
         {"error":"contact list is empty"}, 404
     
-    db_contacts = next((x for x in db if x['id'] == id), None)
+    db_contacts = next((x for x in db if x['id'] == contact_id), None)
     if not db_contacts:
         return {"error": "contact not found"}
 
@@ -145,10 +155,7 @@ def delete_contact(contact_id):
         return {"error": "Contact list is empty"}, 404
     
     database = next((name for name in db if name['id'] == contact_id), None)
-    
-    if not database:
-        return {"error": "contact is not found"}, 404
-    
+
     data = request.get_json()
     first_name = data.get('first_name')
     last_name = data.get('last_name')
