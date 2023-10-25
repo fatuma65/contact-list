@@ -38,10 +38,7 @@ def add_contact():
     for index, number in enumerate(db):
         if number["phone_number"] == phone_number:
             return {"error": "phone number already exists in list"}
-            
-    # if phone_number in db:
-        # return {"error": "phone number already exists"}
-    
+
     new = {
         "first_name":  first_name,
         "last_name": last_name,
@@ -156,30 +153,8 @@ def delete_contact(contact_id):
     
     database = next((name for name in db if name['id'] == contact_id), None)
 
-    data = request.get_json()
-    first_name = data.get('first_name')
-    last_name = data.get('last_name')
-    phone_number = data.get('phone_number')
-    
-    
-    if not first_name: 
-        return {"error": "first name is not found"}
-    else:
-        first_name = database["first_name"]
-
-    if not last_name: 
-        return {"error": "last name is not found"}
-    else:
-        last_name = database["last_name"]
-    
-    if not phone_number: 
-        return {"error": "phone number is not found"}
-    else:
-        phone_number = database["phone_number"]
-    
-    for index, contact in enumerate(db):
-        if contact['id'] == contact_id:
-            db.pop(index)
+    if database["id"] == contact_id:
+        db.pop()
     
     return {"message": "contact successfully deleted"}, 200
     
