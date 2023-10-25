@@ -37,7 +37,7 @@ def add_contact():
    
     for index, number in enumerate(db):
         if number["phone_number"] == phone_number:
-            return {"error": "phone number already exists in list"}
+            return {"error": "phone number already exists in list"}, 400
 
     new = {
         "first_name":  first_name,
@@ -69,7 +69,7 @@ def update_contact(contact_id):
     last_name = data.get('last_name')
     phone_number = data.get('phone_number')
 
-    if not first_name:
+    if first_name:
         if len(first_name) < 3:
             return {"Error": "First name must be atleast 3 characters"}, 400
     else:
