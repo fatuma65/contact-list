@@ -60,7 +60,6 @@ def update_contact(contact_id):
     if not db:
         return {"Error": "Contact list is empty"}, 404
 
-    # db_contact = [d for d in db if d['id'] == str(contact_id)] # if it finds a value, returns that object
     db_contact = next((item for item in db if item['id'] == contact_id), None)
     if not db_contact:
         return {"Error": "Contact not found"}, 404
@@ -88,10 +87,6 @@ def update_contact(contact_id):
     else:
         phone_number = db_contact["phone number"]
 
-    for i, number in enumerate(db):
-        if number["phone_number"] == phone_number:
-            return {"error": "phone number already exists in list"}
-
     new_contact = {
         "first_name": first_name,
         "last_name": last_name,
@@ -113,36 +108,9 @@ def single_contact(contact_id):
     
     db_contacts = next((x for x in db if x['id'] == contact_id), None)
     if not db_contacts:
-        return {"error": "contact not found"}
+        return {"error": "contact not found"}, 404
 
-    data = request.get_json()
-    first_name = data.get('first_name')
-    last_name = data.get('last_name')
-    phone_number = data.get('phone_number')
-
-    if not first_name:
-        return {"Error": "First name is not found"}, 400
-    else:
-        first_name = db_contacts["first_name"]
-
-    if not last_name:
-        return {"Error": "Last name is not found"}, 400
-    else:
-        last_name = db_contacts["last_name"]
-
-    if not phone_number:
-        return {"Error": "Phone number is not found"}, 400
-    else:
-        phone_number = db_contacts["phone_number"]
-
-    new_contact = {
-        "first_name": first_name,
-        "last_name": last_name,
-        "phone_number": phone_number,
-        "id": db_contacts['id']
-    }
-
-    return new_contact
+    return db_contacts
 
 # we can delete a contact in our list by specifying its index.
 @app.route('/contact/<contact_id>', methods = ['DELETE'])   
@@ -152,9 +120,12 @@ def delete_contact(contact_id):
         return {"error": "Contact list is empty"}, 404
     
     database = next((name for name in db if name['id'] == contact_id), None)
-
-    if database["id"] == contact_id:
-        db.pop()
+    if not database:
+        return {"error": "contact id not found"}, 404
+    
+    for index, contact in enumerate(db):
+        if contact['id'] == contact_id:
+            db.pop(index)
     
     return {"message": "contact successfully deleted"}, 200
     
